@@ -143,8 +143,8 @@ function addOverListener(el) {
     // 如果没有任何匹配的句柄，默认行为是修改坐标。
     if (!matched) {
       const style = currentDragElement.style;
-      style.left = parseInt(style.left) + distX + "px";
-      style.top = parseInt(style.top) + distY + "px";
+      style.left = parseInt(style.left === "" ? 0 : style.left) + distX + "px";
+      style.top = parseInt(style.top === "" ? 0 : style.top) + distY + "px";
     }
 
     // 将原始坐标设置未当前坐标，下次将基于这个新坐标进行位移。
@@ -164,6 +164,8 @@ function addOverListener(el) {
  */
 function addEndListener(el) {
   function onDragEnd(e) {
+    // 阻止事件冒泡，否则有可能触发多次（比如容器和拖拽元素）。
+    stopPropagation(e);
     e.preventDefault();
     // TODO 通过css实现
     // if (currentDragElement != null && !currentDragElement.__vueDndScrollMode) {

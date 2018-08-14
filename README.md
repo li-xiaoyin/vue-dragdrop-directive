@@ -1,39 +1,168 @@
 # vue-dragdrop-directive
 
-#### 项目介绍
-{**以下是码云平台说明，您可以替换为您的项目简介**
-码云是开源中国推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用码云实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## Installation
 
-#### 软件架构
-软件架构说明
+```shell
+# will publish after 2018-08-15 15:00
+npm install vue-dragdrop-directive
+```
 
+### register in .js file:
 
-#### 安装教程
+```javascript
+import vueDragDrop from "vue-dragdrop-directive";
 
-1. xxxx
-2. xxxx
-3. xxxx
+Vue.use(vueDragDrop);
+```
 
-#### 使用说明
+## Typical use
 
-1. xxxx
-2. xxxx
-3. xxxx
+### Movement
 
-#### 参与贡献
+```vue
+<!--
+	v-drag-drop run in delegate mode by default.
+	all of elements which has draggable="true" can be fire drag event under the v-drag-drop.
+-->
+<template>
+	<div v-drag-drop class="container">
+        <div draggable="true" class="draggable"></div>
+    </div>
+</template>
 
-1. Fork 本项目
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+<style>
+    .container {
+        width: 800px; 
+        height: 800px;
+    }
+    
+    .draggable {
+        /* v-dragdrop is a basic lib, you must write absolute your self*/ 
+        position: absolute; 
+        width: 100px; 
+        height: 100px; 
+        background-color: dodgerblue;
+    }
+</style>
+```
 
+### Resize
 
-#### 码云特技
+```vue
+<template>
+	<div v-drag-drop="{handler:resizeHandler}" class="container">
+        <div class="resizable">
+            <!-- in this case draggable attribute set to a resize handler. -->
+            <div draggable="true" class="resizer"></div>
+    	</div>
+    </div>
+</template>
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [http://git.mydoc.io/](http://git.mydoc.io/)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+<script>
+    export default {
+        /**
+         *	key point, v-drag-drop can set a props named "handler",
+         * 	in this case handler is a function, when it is a function, it will be called on drag
+         * 	
+         *	@param el the dom element which on drag.
+         *	@param container the dom element which mouse over in the container.
+         *	@param distX the horizontal distance of mouse movement.
+         *	@param distY the vertical distance of mouse movement.
+         *	@param e the dom event object of "ondragover"
+         */
+        resizeHandler(el, container, distX, distY, e) {
+            const style = el.parentNode.style;
+            style.width = parseInt(style.width) + distX + "px";
+            style.height = parseInt(style.height) + distY + "px";
+            
+            // you also can change scroll position like following code:
+            // const parent = el.parentNode;
+            // parent.scrollTo(parent.scrollLeft - distX, parent.scrollTop - distY);
+        }
+    }
+</script>
+
+<style>
+    .container {
+        width: 800px; 
+        height: 800px;
+    }
+    
+    .resizable {
+        /* v-dragdrop is a basic lib, you must write absolute your self*/ 
+        position: absolute; 
+        width: 100px; 
+        height: 100px; 
+        background-color: dodgerblue;
+    }
+    
+    .resizer {
+        cursor: se-resize; 
+        width: 11px; 
+        height: 11px; 
+        position: absolute; 
+        background-color: yellow; 
+        font-size: 0.1px; 
+        display: block; 
+        z-index: 90;
+        right: 0;
+        bottom: 0;
+    }
+</style>
+```
+
+## Props
+
+v-dragdrop support the following props：
+
+* allowOver (default is true)
+
+  when it is false, the dom can not be listen ondragover event on the dom.
+
+* handler (default is undefined)
+
+  handler is an extensibility, it can be write in three forms:
+
+  * Function
+
+    when it is a function, it will be called on drag. 
+
+  * Object
+
+    **coming soon.**
+
+    when it is a object, it will be contains two functions like following, requires at least one .
+
+    ```javascript
+    {
+        onDrag(currentDragElement, container, distX, distY, e) {
+    		// call on drag.
+        },
+        onDrop(currentDragElement, e) {
+             // call on drop.
+        }
+    }
+    ```
+
+  * Array
+
+    when it is a array, the element must be a object which contains three functions like following:
+
+    ```javascript
+    {
+        match(currentDragElement) {
+            // is required in array mode.
+            // decide if onDrag/onDrop can be called for this element(currentDragElement)
+        },
+        onDrag(currentDragElement, container, distX, distY, e) {
+    		// call on drag.
+        },
+        onDrop(currentDragElement, e) {
+             // call on drop.
+        }
+    }
+    ```
+
+    
+
+    
